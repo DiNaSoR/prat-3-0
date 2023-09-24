@@ -37,8 +37,9 @@ Prat:AddModuleToLoad(function()
     ["Use Alt key for cursor movement"] = true,
     ["Requires the Alt key to be held down to move the cursor in chat"] = true,
     ["Font"] = true,
-    currently_broken_alt_behavior = "Arrow key behaviour broken in current WoW client,\n\nUse ALT-UP and ALT-DOWN instead of just UP DOWN to access history",
+    ["Font Size"] = "Font Size",
     ["Select the font to use for the edit box"] = true,
+    ["Enter a non-zero value here to override the default font size."] = true
   })
   --@end-debug@
 
@@ -292,6 +293,30 @@ end
           end
         end
       },
+      fontSize = {
+        type = "range",
+        name = PL["Font Size"],
+        desc = PL["Enter a non-zero value here to override the default font size."],
+        min = 0,
+        max = 44,
+        step = 1,
+        bigStep = 1,
+        get = function() return mod.db.profile.fontSize end,
+        set = function(info, v)
+          mod.db.profile.fontSize = v
+          for i = 1, #CHAT_FRAMES do
+            local ff = _G["ChatFrame" .. i .. "EditBox"]
+            local header = _G[ff:GetName() .. "Header"]
+            local _, s, m = ff:GetFont()
+            local font = Media:Fetch("font", v)
+            if mod.db.profile.fontSize ~= 0 then
+              s = mod.db.profile.fontSize
+            end
+            ff:SetFont(font, s, m)
+            header:SetFont(font, s, m)
+          end
+        end
+      },
     },
   })
 
@@ -317,7 +342,8 @@ end
             if v == f then return k end
           end
         end
-      end)()
+      end)(),
+      fontsize = 0,
     }
   })
 
